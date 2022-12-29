@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "136673728513",
+    "project_id": "socialfacebook-5f9df",
+    "storage_bucket": "socialfacebook-5f9df.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136673728513:android:38d9c86a8e580bd9a90800",
+        "android_client_info": {
+          "package_name": "com.socialnetworkreactnative"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "136673728513-ov30r7mghmonu9kqqjpbhogptj9hd9kj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPtq1EpUvV1zld4JY82fSb5RGg6uslMZI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "136673728513-ov30r7mghmonu9kqqjpbhogptj9hd9kj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
