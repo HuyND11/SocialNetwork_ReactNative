@@ -10,7 +10,10 @@ const BottomTab = () => {
   const Tab = createBottomTabNavigator();
   const isFocused = useIsFocused();
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}>
       <Tab.Screen
         name="home"
         component={Home}
