@@ -1,4 +1,5 @@
 import {Text, View} from 'react-native';
+import MyButton from '../../components/Button';
 
 const Home = () => {
   return (
