@@ -7,16 +7,70 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconFontisto from 'react-native-vector-icons/Fontisto';
+import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../utils';
+import {getData, navigateAuthorized, storeData} from '../../shared/auth';
+import {validateEmail} from '../../shared/validateForm';
 
 const Login = ({navigation}) => {
-  const [userName, setUserName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secure, setSecure] = useState(true);
+  const [errorMessages, setErrorMessages] = useState({
+    email: '',
+    password: '',
+  });
+
+  useEffect(() => {
+    auth().onAuthStateChanged(user => {
+      (async () => {
+        const uid = await getData('pnvoUid');
+        if (user.uid == uid) {
+          console.log('loginnnnnnnnnnnnnnnnnnnnnn');
+          // navigateAuthorized(navigation);
+        }
+      })();
+    });
+  }, []);
+
+  const validate = () => {
+    let check = true;
+    let errMess = {
+      email: '',
+      password: '',
+    };
+    if (!validateEmail(email)) {
+      check = false;
+      errMess.email = 'Invalid email format';
+    }
+    if (email === '') {
+      check = false;
+      errMess.email = 'Required input';
+    }
+    if (password === '') {
+      check = false;
+      errMess.password = 'Required input';
+    }
+    setErrorMessages(errMess);
+    return check;
+  };
+
+  const handleLogin = () => {
+    if (!validate()) {
+      return;
+    }
+
+    auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(users => {
+        storeData('pnvoUid', users.user.uid);
+      })
+      .catch(err => alert(err.message));
+  };
 
   return (
     <View style={styles.container}>
@@ -27,18 +81,25 @@ const Login = ({navigation}) => {
 
       <View style={styles.form}>
         <View style={styles.groupInput}>
-          <Text style={styles.inputLabel}>Username</Text>
+          <Text style={styles.inputLabel}>Email</Text>
+          {errorMessages.email && (
+            <Text style={styles.textErr}>{errorMessages.email}</Text>
+          )}
           <View style={styles.inputIcon}>
             <TextInput
               style={styles.input}
-              onChangeText={newText => setUserName(newText)}
-              defaultValue={userName}
+              onChangeText={newText => setEmail(newText)}
+              defaultValue={email}
+              keyboardType="email-address"
             />
             <Icon name="user" size={28} style={styles.icon} />
           </View>
         </View>
         <View style={styles.groupInput}>
           <Text style={styles.inputLabel}>Password</Text>
+          {errorMessages.password && (
+            <Text style={styles.textErr}>{errorMessages.password}</Text>
+          )}
           <View style={styles.inputIcon}>
             <TextInput
               style={styles.input}
@@ -58,24 +119,19 @@ const Login = ({navigation}) => {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.loginButton}
-        onPress={() => {
-          navigation.reset({
-            index: 0,
-            routes: [{name: 'main'}],
-          });
-        }}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          alert('Forgot password!');
-        }}>
-        <Text style={styles.forgot}>Forgot password?</Text>
-      </TouchableOpacity>
+      <View style={styles.fogotAndMore}>
+        <TouchableOpacity
+          onPress={() => {
+            alert('Forgot password!');
+          }}>
+          <Text style={styles.forgot}>Forgot password?</Text>
+        </TouchableOpacity>
 
-      <Text style={{color: COLORS.whiteText}}>OR</Text>
+        <Text style={{color: COLORS.whiteText}}>OR</Text>
+      </View>
 
       <View style={styles.groupBtnOther}>
         <TouchableOpacity style={styles.btnOther}>
@@ -158,9 +214,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   //Forgot
+  fogotAndMore: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   forgot: {
     fontSize: 15,
     color: COLORS.likedBtn,
+    marginBottom: 15,
   },
   groupBtnOther: {
     width: '100%',
@@ -190,6 +251,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: COLORS.bgActiveBtn,
     fontWeight: '700',
+  },
+  // Error text
+  textErr: {
+    color: COLORS.likedBtn,
+    fontWeight: '500',
+    fontSize: 13,
   },
 });
 export default Login;

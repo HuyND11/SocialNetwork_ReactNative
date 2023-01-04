@@ -11,16 +11,80 @@ import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconFontisto from 'react-native-vector-icons/Fontisto';
+import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../utils';
+import {validateEmail} from '../../shared/validateForm';
 
 const Register = ({navigation}) => {
+  const [secure, setSecure] = useState(true);
   const [params, setParams] = useState({
     email: '',
     username: '',
     password: '',
   });
-  const [secure, setSecure] = useState(true);
+  const [errorMessages, setErrorMessages] = useState({
+    email: '',
+    username: '',
+    password: '',
+  });
 
+  const validate = () => {
+    let check = true;
+    let errMess = {
+      email: '',
+      username: '',
+      password: '',
+    };
+    if (!validateEmail(params.email)) {
+      check = false;
+      errMess.email = 'Invalid email format';
+    }
+    if (params.email === '') {
+      check = false;
+      errMess.email = 'Required input';
+    }
+    if (params.password === '') {
+      check = false;
+      errMess.password = 'Required input';
+    }
+    if (params.username === '') {
+      check = false;
+      errMess.username = 'Required input';
+    }
+    setErrorMessages(errMess);
+    return check;
+  };
+
+  const resetErrorMessage = () => {
+    setErrorMessages({
+      email: '',
+      username: '',
+      password: '',
+    })
+  }
+  const handleRegister = () => {
+    if (!validate()) {
+      return;
+    }
+    auth()
+      .createUserWithEmailAndPassword(params.email, params.password)
+      .then(users => {
+        const user = users.user;
+        // TODO: post user info to firebase
+        navigation.navigate('login', {userInfo: user});
+      })
+      .catch(err => {
+        if (
+          err.message ===
+          '[auth/email-already-in-use] The email address is already in use by another account.'
+        ) {
+          setErrorMessages({
+            ...errorMessages,
+            ['email']: 'Email address is already existing',
+          });
+        }
+      });
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -31,6 +95,9 @@ const Register = ({navigation}) => {
       <View style={styles.form}>
         <View style={styles.groupInput}>
           <Text style={styles.inputLabel}>Email</Text>
+          {errorMessages.email && (
+            <Text style={styles.textErr}>{errorMessages.email}</Text>
+          )}
           <View style={styles.inputIcon}>
             <TextInput
               style={styles.input}
@@ -39,12 +106,16 @@ const Register = ({navigation}) => {
               }
               defaultValue={params.email}
               keyboardType="email-address"
+              onBlur={resetErrorMessage}
             />
             <Icon name="user" size={28} style={styles.icon} />
           </View>
         </View>
         <View style={styles.groupInput}>
           <Text style={styles.inputLabel}>Username</Text>
+          {errorMessages.username && (
+            <Text style={styles.textErr}>{errorMessages.username}</Text>
+          )}
           <View style={styles.inputIcon}>
             <TextInput
               style={styles.input}
@@ -52,12 +123,16 @@ const Register = ({navigation}) => {
                 setParams({...params, ['username']: newText})
               }
               defaultValue={params.username}
+              onBlur={resetErrorMessage}
             />
             <Icon name="user" size={28} style={styles.icon} />
           </View>
         </View>
         <View style={styles.groupInput}>
           <Text style={styles.inputLabel}>Password</Text>
+          {errorMessages.password && (
+            <Text style={styles.textErr}>{errorMessages.password}</Text>
+          )}
           <View style={styles.inputIcon}>
             <TextInput
               style={styles.input}
@@ -66,6 +141,7 @@ const Register = ({navigation}) => {
               }
               defaultValue={params.password}
               secureTextEntry={secure}
+              onBlur={resetErrorMessage}
             />
             <Icon
               name={secure ? 'eye-off' : 'eye'}
@@ -79,22 +155,8 @@ const Register = ({navigation}) => {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.loginButton}
-        onPress={() => {
-          console.log('params', params);
-          // navigation.reset({
-          //   index: 0,
-          //   routes: [{name: 'main'}],
-          // });
-        }}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          alert('Forgot password!');
-        }}>
-        <Text style={styles.forgot}>Forgot password?</Text>
       </TouchableOpacity>
 
       <Text style={{color: COLORS.whiteText}}>OR</Text>
@@ -195,6 +257,12 @@ const styles = StyleSheet.create({
   textBtnOther: {
     fontWeight: '700',
     color: COLORS.whiteText,
+  },
+  // Error text
+  textErr: {
+    color: COLORS.likedBtn,
+    fontWeight: '500',
+    fontSize: 13,
   },
 });
 export default Register;

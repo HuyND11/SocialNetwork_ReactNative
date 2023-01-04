@@ -9,7 +9,7 @@ export const decodePwd = encoded => {
   return base64.decode(encoded);
 };
 
-const storeData = async (key, val) => {
+export const storeData = async (key, val) => {
   try {
     await AsyncStorage.setItem(key, val);
   } catch (e) {
@@ -17,13 +17,20 @@ const storeData = async (key, val) => {
   }
 };
 
-const getData = async key => {
+export const getData = async key => {
   try {
     const value = await AsyncStorage.getItem(key);
     if (value !== null) {
       return value;
     }
   } catch (e) {
-    return 'error: ' + e;
+    console.log('error: ' + e);
   }
+};
+
+export const navigateAuthorized = navigation => {
+  navigation.reset({
+    index: 0,
+    routes: [{name: 'main'}],
+  });
 };
