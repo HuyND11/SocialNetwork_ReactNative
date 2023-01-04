@@ -32,7 +32,7 @@ export default MyButton;
 
 const styles = StyleSheet.create({
   btn: {
-    width: '50%',
+    width: '45%',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 12,
