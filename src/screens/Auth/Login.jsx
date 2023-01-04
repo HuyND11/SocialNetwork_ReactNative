@@ -15,6 +15,8 @@ import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../utils';
 import {getData, navigateAuthorized, storeData} from '../../shared/auth';
 import {validateEmail} from '../../shared/validateForm';
+import {ButtonActive, ButtonService} from './components/Button';
+import Input from './components/Input';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -59,6 +61,18 @@ const Login = ({navigation}) => {
     return check;
   };
 
+  const handleBlur = () => {
+    setErrorMessages({
+      email: '',
+      password: '',
+    });
+  };
+  () => {
+    setErrorMessages({
+      email: '',
+      password: '',
+    });
+  };
   const handleLogin = () => {
     if (!validate()) {
       return;
@@ -80,52 +94,35 @@ const Login = ({navigation}) => {
       />
 
       <View style={styles.form}>
-        <View style={styles.groupInput}>
-          <Text style={styles.inputLabel}>Email</Text>
-          {errorMessages.email && (
-            <Text style={styles.textErr}>{errorMessages.email}</Text>
-          )}
-          <View style={styles.inputIcon}>
-            <TextInput
-              style={styles.input}
-              onChangeText={newText => setEmail(newText)}
-              defaultValue={email}
-              keyboardType="email-address"
-            />
-            <Icon name="user" size={28} style={styles.icon} />
-          </View>
-        </View>
-        <View style={styles.groupInput}>
-          <Text style={styles.inputLabel}>Password</Text>
-          {errorMessages.password && (
-            <Text style={styles.textErr}>{errorMessages.password}</Text>
-          )}
-          <View style={styles.inputIcon}>
-            <TextInput
-              style={styles.input}
-              onChangeText={newText => setPassword(newText)}
-              defaultValue={password}
-              secureTextEntry={secure}
-            />
-            <Icon
-              name={secure ? 'eye-off' : 'eye'}
-              size={28}
-              style={styles.icon}
-              onPress={() => {
-                setSecure(!secure);
-              }}
-            />
-          </View>
-        </View>
+        <Input
+          label="Email"
+          errMess={errorMessages.email}
+          onChangeText={newText => setEmail(newText)}
+          defaultValue={email}
+          keyboardType="email-address"
+          iconName="mail"
+          handleBlur={handleBlur}
+        />
+
+        <Input
+          label="Password"
+          errMess={errorMessages.password}
+          onChangeText={newText => setPassword(newText)}
+          defaultValue={password}
+          iconName={secure ? 'eye-off' : 'eye'}
+          handleBlur={handleBlur}
+          secure={secure}
+          handlePressIcon={() => {
+            setSecure(!secure);
+          }}
+        />
       </View>
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+      <ButtonActive text="Login" handlePress={handleLogin} />
       <View style={styles.fogotAndMore}>
         <TouchableOpacity
           onPress={() => {
-            alert('Forgot password!');
+            navigation.navigate('forgot');
           }}>
           <Text style={styles.forgot}>Forgot password?</Text>
         </TouchableOpacity>
@@ -134,16 +131,20 @@ const Login = ({navigation}) => {
       </View>
 
       <View style={styles.groupBtnOther}>
-        <TouchableOpacity style={styles.btnOther}>
-          <IconAntDesign name="google" size={28} style={styles.icon} />
-          <Text style={styles.textBtnOther}>Continue with Google</Text>
-          <Text></Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btnOther}>
-          <IconFontisto name="facebook" size={28} style={styles.icon} />
-          <Text style={styles.textBtnOther}>Continue with Facebook</Text>
-          <Text></Text>
-        </TouchableOpacity>
+        <ButtonService
+          service="google"
+          handlePress={() => {
+            // TODO: login with google
+            alert('Login with google');
+          }}
+        />
+        <ButtonService
+          service="facebook"
+          handlePress={() => {
+            // TODO: login with facebook
+            alert('Login with Facebook');
+          }}
+        />
       </View>
       <View style={styles.didnAccount}>
         <Text style={{color: COLORS.whiteText}}>Do not have account?</Text>
@@ -173,46 +174,6 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
-  //Group input
-  groupInput: {
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.secondaryBg,
-    width: '100%',
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  inputIcon: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  input: {
-    color: COLORS.whiteText,
-    fontSize: 18,
-    width: '90%',
-    paddingLeft: 20,
-  },
-  inputLabel: {
-    color: COLORS.whiteText,
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  icon: {
-    color: COLORS.whiteText,
-  },
-
-  //Button
-  loginButton: {
-    width: '100%',
-    backgroundColor: COLORS.bgActiveBtn,
-    paddingVertical: 20,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: COLORS.whiteText,
-    textAlign: 'center',
-    fontSize: 24,
-  },
   //Forgot
   fogotAndMore: {
     justifyContent: 'center',
@@ -226,21 +187,6 @@ const styles = StyleSheet.create({
   groupBtnOther: {
     width: '100%',
   },
-  btnOther: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: COLORS.whiteText,
-    marginBottom: 20,
-  },
-  textBtnOther: {
-    fontWeight: '700',
-    color: COLORS.whiteText,
-  },
   // register
   didnAccount: {
     flexDirection: 'row',
@@ -251,12 +197,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: COLORS.bgActiveBtn,
     fontWeight: '700',
-  },
-  // Error text
-  textErr: {
-    color: COLORS.likedBtn,
-    fontWeight: '500',
-    fontSize: 13,
   },
 });
 export default Login;

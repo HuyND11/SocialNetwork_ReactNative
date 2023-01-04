@@ -14,6 +14,8 @@ import IconFontisto from 'react-native-vector-icons/Fontisto';
 import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../utils';
 import {validateEmail} from '../../shared/validateForm';
+import Input from './components/Input';
+import { ButtonActive, ButtonService } from './components/Button';
 
 const Register = ({navigation}) => {
   const [secure, setSecure] = useState(true);
@@ -55,13 +57,13 @@ const Register = ({navigation}) => {
     return check;
   };
 
-  const resetErrorMessage = () => {
+  const handleBlur = () => {
     setErrorMessages({
       email: '',
       username: '',
       password: '',
-    })
-  }
+    });
+  };
   const handleRegister = () => {
     if (!validate()) {
       return;
@@ -93,85 +95,62 @@ const Register = ({navigation}) => {
       />
 
       <View style={styles.form}>
-        <View style={styles.groupInput}>
-          <Text style={styles.inputLabel}>Email</Text>
-          {errorMessages.email && (
-            <Text style={styles.textErr}>{errorMessages.email}</Text>
-          )}
-          <View style={styles.inputIcon}>
-            <TextInput
-              style={styles.input}
-              onChangeText={newText =>
-                setParams({...params, ['email']: newText})
-              }
-              defaultValue={params.email}
-              keyboardType="email-address"
-              onBlur={resetErrorMessage}
-            />
-            <Icon name="user" size={28} style={styles.icon} />
-          </View>
-        </View>
-        <View style={styles.groupInput}>
-          <Text style={styles.inputLabel}>Username</Text>
-          {errorMessages.username && (
-            <Text style={styles.textErr}>{errorMessages.username}</Text>
-          )}
-          <View style={styles.inputIcon}>
-            <TextInput
-              style={styles.input}
-              onChangeText={newText =>
-                setParams({...params, ['username']: newText})
-              }
-              defaultValue={params.username}
-              onBlur={resetErrorMessage}
-            />
-            <Icon name="user" size={28} style={styles.icon} />
-          </View>
-        </View>
-        <View style={styles.groupInput}>
-          <Text style={styles.inputLabel}>Password</Text>
-          {errorMessages.password && (
-            <Text style={styles.textErr}>{errorMessages.password}</Text>
-          )}
-          <View style={styles.inputIcon}>
-            <TextInput
-              style={styles.input}
-              onChangeText={newText =>
-                setParams({...params, ['password']: newText})
-              }
-              defaultValue={params.password}
-              secureTextEntry={secure}
-              onBlur={resetErrorMessage}
-            />
-            <Icon
-              name={secure ? 'eye-off' : 'eye'}
-              size={28}
-              style={styles.icon}
-              onPress={() => {
-                setSecure(!secure);
-              }}
-            />
-          </View>
-        </View>
+        <Input
+          label="Email"
+          errMess={errorMessages.email}
+          onChangeText={newText => setParams({...params, ['email']: newText})}
+          defaultValue={params.email}
+          keyboardType="email-address"
+          iconName="mail"
+          handleBlur={handleBlur}
+        />
+
+        <Input
+          label="Username"
+          errMess={errorMessages.username}
+          onChangeText={newText =>
+            setParams({...params, ['username']: newText})
+          }
+          defaultValue={params.username}
+          iconName="user"
+          handleBlur={handleBlur}
+        />
+
+        <Input
+          label="Password"
+          errMess={errorMessages.password}
+          onChangeText={newText =>
+            setParams({...params, ['password']: newText})
+          }
+          defaultValue={params.password}
+          iconName={secure ? 'eye-off' : 'eye'}
+          handleBlur={handleBlur}
+          secure={secure}
+          handlePressIcon={() => {
+            setSecure(!secure);
+          }}
+        />
       </View>
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
+      <ButtonActive text="Register" handlePress={handleRegister} />
 
       <Text style={{color: COLORS.whiteText}}>OR</Text>
 
       <View style={styles.groupBtnOther}>
-        <TouchableOpacity style={styles.btnOther}>
-          <IconAntDesign name="google" size={28} style={styles.icon} />
-          <Text style={styles.textBtnOther}>Continue with Google</Text>
-          <Text></Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btnOther}>
-          <IconFontisto name="facebook" size={28} style={styles.icon} />
-          <Text style={styles.textBtnOther}>Continue with Facebook</Text>
-          <Text></Text>
-        </TouchableOpacity>
+      <ButtonService
+          service="google"
+          handlePress={() => {
+            // TODO: register with google
+            alert('register with google');
+          }}
+        />
+        <ButtonService
+          service="facebook"
+          handlePress={() => {
+            // TODO: register with facebook
+            alert('register with Facebook');
+          }}
+        />
       </View>
     </View>
   );

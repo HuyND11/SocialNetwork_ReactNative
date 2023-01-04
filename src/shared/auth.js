@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import base64 from 'react-native-base64';
+import auth from '@react-native-firebase/auth';
 
 export const encodePwd = pwd => {
   return base64.encode(pwd);
@@ -33,4 +34,10 @@ export const navigateAuthorized = navigation => {
     index: 0,
     routes: [{name: 'main'}],
   });
+};
+
+export const logOut = () => {
+  auth()
+    .signOut()
+    .then(() => console.log('Log out'));
 };
