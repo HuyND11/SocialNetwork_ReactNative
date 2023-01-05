@@ -17,6 +17,7 @@ import {getData, navigateAuthorized, storeData} from '../../shared/auth';
 import {validateEmail} from '../../shared/validateForm';
 import {ButtonActive, ButtonService} from './components/Button';
 import Input from './components/Input';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -30,10 +31,15 @@ const Login = ({navigation}) => {
   useEffect(() => {
     auth().onAuthStateChanged(user => {
       (async () => {
-        const uid = await getData('pnvoUid');
-        if (user.uid == uid) {
-          console.log('loginnnnnnnnnnnnnnnnnnnnnn');
-          // navigateAuthorized(navigation);
+        const token = await getData('pnvoToken');
+        console.log('user', user);
+        if (
+          user !== null &&
+          (await (await auth().currentUser.getIdTokenResult()).token) === token
+        ) {
+          // ! delete log token
+          console.log('tokenn', await auth().currentUser.getIdToken());
+          navigateAuthorized(navigation);
         }
       })();
     });
@@ -47,15 +53,15 @@ const Login = ({navigation}) => {
     };
     if (!validateEmail(email)) {
       check = false;
-      errMess.email = 'Invalid email format';
+      errMess.email = 'Invalid email format!';
     }
     if (email === '') {
       check = false;
-      errMess.email = 'Required input';
+      errMess.email = 'Required input!';
     }
     if (password === '') {
       check = false;
-      errMess.password = 'Required input';
+      errMess.password = 'Required input!';
     }
     setErrorMessages(errMess);
     return check;
@@ -80,10 +86,31 @@ const Login = ({navigation}) => {
 
     auth()
       .signInWithEmailAndPassword(email, password)
-      .then(users => {
-        storeData('pnvoUid', users.user.uid);
+      .then(async () => {
+        const token = await (await auth().currentUser.getIdTokenResult()).token;
+        storeData('pnvoToken', token);
       })
-      .catch(err => alert(err.message));
+      .catch(err => {
+        let errMess = {email: '', password: ''};
+        if (
+          err.message ===
+          '[auth/wrong-password] The password is invalid or the user does not have a password.'
+        ) {
+          setErrorMessages({
+            ...errorMessages,
+            ['password']: 'Invalid password!',
+          });
+        }
+        if (
+          err.message ===
+          '[auth/user-not-found] There is no user record corresponding to this identifier. The user may have been deleted.'
+        ) {
+          setErrorMessages({
+            email: 'Invalid email or password!',
+            password: 'Invalid email or password!'
+          });
+        }
+      });
   };
 
   return (

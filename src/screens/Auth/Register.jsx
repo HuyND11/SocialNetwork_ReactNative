@@ -15,7 +15,7 @@ import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../utils';
 import {validateEmail} from '../../shared/validateForm';
 import Input from './components/Input';
-import { ButtonActive, ButtonService } from './components/Button';
+import {ButtonActive, ButtonService} from './components/Button';
 
 const Register = ({navigation}) => {
   const [secure, setSecure] = useState(true);
@@ -39,19 +39,19 @@ const Register = ({navigation}) => {
     };
     if (!validateEmail(params.email)) {
       check = false;
-      errMess.email = 'Invalid email format';
+      errMess.email = 'Invalid email format!';
     }
     if (params.email === '') {
       check = false;
-      errMess.email = 'Required input';
+      errMess.email = 'Required input!';
     }
     if (params.password === '') {
       check = false;
-      errMess.password = 'Required input';
+      errMess.password = 'Required input!';
     }
     if (params.username === '') {
       check = false;
-      errMess.username = 'Required input';
+      errMess.username = 'Required input!';
     }
     setErrorMessages(errMess);
     return check;
@@ -70,10 +70,9 @@ const Register = ({navigation}) => {
     }
     auth()
       .createUserWithEmailAndPassword(params.email, params.password)
-      .then(users => {
-        const user = users.user;
-        // TODO: post user info to firebase
-        navigation.navigate('login', {userInfo: user});
+      .then(async () => {
+        await auth().currentUser.updateProfile({displayName: params.username});
+        navigation.navigate('login');
       })
       .catch(err => {
         if (
@@ -82,7 +81,7 @@ const Register = ({navigation}) => {
         ) {
           setErrorMessages({
             ...errorMessages,
-            ['email']: 'Email address is already existing',
+            ['email']: 'Email address is already existing!',
           });
         }
       });
@@ -137,7 +136,7 @@ const Register = ({navigation}) => {
       <Text style={{color: COLORS.whiteText}}>OR</Text>
 
       <View style={styles.groupBtnOther}>
-      <ButtonService
+        <ButtonService
           service="google"
           handlePress={() => {
             // TODO: register with google

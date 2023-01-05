@@ -26,6 +26,7 @@ const App = () => {
             headerStyle: {backgroundColor: COLORS.primaryBg},
             title: '',
             headerTintColor: COLORS.bgActiveBtn,
+            animation: 'slide_from_right',
           }}
         />
         <Stack.Screen
@@ -36,6 +37,7 @@ const App = () => {
             headerStyle: {backgroundColor: COLORS.primaryBg},
             title: '',
             headerTintColor: COLORS.bgActiveBtn,
+            animation: 'slide_from_right',
           }}
         />
         <Stack.Screen name="main" component={BottomTab} />

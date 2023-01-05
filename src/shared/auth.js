@@ -23,6 +23,8 @@ export const getData = async key => {
     const value = await AsyncStorage.getItem(key);
     if (value !== null) {
       return value;
+    } else {
+      return '';
     }
   } catch (e) {
     console.log('error: ' + e);
@@ -39,5 +41,5 @@ export const navigateAuthorized = navigation => {
 export const logOut = () => {
   auth()
     .signOut()
-    .then(() => console.log('Log out'));
+    .then(() => AsyncStorage.removeItem('pnvoToken'));
 };
