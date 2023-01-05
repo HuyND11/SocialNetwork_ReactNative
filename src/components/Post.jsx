@@ -3,6 +3,7 @@ import React from 'react';
 import UserInfo from './UserInfo';
 import PostContent from './PostContent';
 import PostImage from './PostImage';
+import ReactBar from './ReactBar';
 
 const Post = () => {
   return (
@@ -10,6 +11,7 @@ const Post = () => {
       <UserInfo />
       <PostContent> asdjksfskajhsfkjs</PostContent>
       <PostImage />
+      <ReactBar />
     </View>
   );
 };

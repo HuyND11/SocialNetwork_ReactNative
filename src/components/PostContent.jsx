@@ -2,11 +2,18 @@ import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {FontSize} from '../utils';
 import {COLORS} from './../utils/index';
+import SeeMore from 'react-native-see-more-inline';
 
 const PostContent = ({children}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.content}>{children} asasjsssajfhfjhsgfjhsa fsdfds dfdsfdf dfdsfjdhskdjhs asdasdha s ajs djas jdsaj djas jsaj dasj jas jdasjd kd dfsdhfkjdhgj dsg lsdgkjdghsdkhgkdkf</Text>
+      <SeeMore
+        numberOfLines={2}
+        seeMoreText="See more"
+        linkColor="#2E75F0"
+        style={styles.content}>
+        {children} 
+      </SeeMore>
     </View>
   );
 };
