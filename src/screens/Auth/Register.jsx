@@ -8,9 +8,6 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import Icon from 'react-native-vector-icons/Feather';
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
-import IconFontisto from 'react-native-vector-icons/Fontisto';
 import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../utils';
 import {validateEmail} from '../../shared/validateForm';

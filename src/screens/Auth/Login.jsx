@@ -1,27 +1,21 @@
 import {
-  Dimensions,
   Image,
+  StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import Icon from 'react-native-vector-icons/Feather';
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
-import IconFontisto from 'react-native-vector-icons/Fontisto';
 import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../utils';
 import {getData, navigateAuthorized, storeData} from '../../shared/auth';
 import {validateEmail} from '../../shared/validateForm';
 import {ButtonActive, ButtonService} from './components/Button';
 import Input from './components/Input';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({navigation}) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [params, setParams] = useState({email: '', password: ''});
   const [secure, setSecure] = useState(true);
   const [errorMessages, setErrorMessages] = useState({
     email: '',
@@ -32,7 +26,6 @@ const Login = ({navigation}) => {
     auth().onAuthStateChanged(user => {
       (async () => {
         const token = await getData('pnvoToken');
-        console.log('user', user);
         if (
           user !== null &&
           (await (await auth().currentUser.getIdTokenResult()).token) === token
@@ -51,15 +44,15 @@ const Login = ({navigation}) => {
       email: '',
       password: '',
     };
-    if (!validateEmail(email)) {
+    if (!validateEmail(params.email)) {
       check = false;
       errMess.email = 'Invalid email format!';
     }
-    if (email === '') {
+    if (params.email === '') {
       check = false;
       errMess.email = 'Required input!';
     }
-    if (password === '') {
+    if (params.password === '') {
       check = false;
       errMess.password = 'Required input!';
     }
@@ -85,10 +78,11 @@ const Login = ({navigation}) => {
     }
 
     auth()
-      .signInWithEmailAndPassword(email, password)
+      .signInWithEmailAndPassword(params.email, params.password)
       .then(async () => {
         const token = await (await auth().currentUser.getIdTokenResult()).token;
         storeData('pnvoToken', token);
+        navigation.navigate('main');
       })
       .catch(err => {
         let errMess = {email: '', password: ''};
@@ -107,7 +101,7 @@ const Login = ({navigation}) => {
         ) {
           setErrorMessages({
             email: 'Invalid email or password!',
-            password: 'Invalid email or password!'
+            password: 'Invalid email or password!',
           });
         }
       });
@@ -115,6 +109,7 @@ const Login = ({navigation}) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar backgroundColor={COLORS.primaryBg} barStyle="light-content" />
       <Image
         source={require('../../assets/images/logo.png')}
         style={styles.logo}
@@ -124,8 +119,8 @@ const Login = ({navigation}) => {
         <Input
           label="Email"
           errMess={errorMessages.email}
-          onChangeText={newText => setEmail(newText)}
-          defaultValue={email}
+          onChangeText={newText => setParams({...params, ['email']: newText})}
+          defaultValue={params.email}
           keyboardType="email-address"
           iconName="mail"
           handleBlur={handleBlur}
@@ -134,8 +129,10 @@ const Login = ({navigation}) => {
         <Input
           label="Password"
           errMess={errorMessages.password}
-          onChangeText={newText => setPassword(newText)}
-          defaultValue={password}
+          onChangeText={newText =>
+            setParams({...params, ['password']: newText})
+          }
+          defaultValue={params.password}
           iconName={secure ? 'eye-off' : 'eye'}
           handleBlur={handleBlur}
           secure={secure}
