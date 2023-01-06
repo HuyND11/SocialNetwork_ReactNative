@@ -3,13 +3,18 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../utils';
-import {getData, navigateAuthorized, storeData} from '../../shared/auth';
+import {
+  checkTokenAndNavigate,
+  navigateAuthorized,
+  storeData,
+} from '../../shared/auth';
 import {validateEmail} from '../../shared/validateForm';
 import {ButtonActive, ButtonService} from './components/Button';
 import Input from './components/Input';
@@ -17,25 +22,14 @@ import Input from './components/Input';
 const Login = ({navigation}) => {
   const [params, setParams] = useState({email: '', password: ''});
   const [secure, setSecure] = useState(true);
+  const [isForgetting, setIsForgetting] = useState(false);
   const [errorMessages, setErrorMessages] = useState({
     email: '',
     password: '',
   });
 
   useEffect(() => {
-    auth().onAuthStateChanged(user => {
-      (async () => {
-        const token = await getData('pnvoToken');
-        if (
-          user !== null &&
-          (await (await auth().currentUser.getIdTokenResult()).token) === token
-        ) {
-          // ! delete log token
-          console.log('tokenn', await auth().currentUser.getIdToken());
-          navigateAuthorized(navigation);
-        }
-      })();
-    });
+    checkTokenAndNavigate(navigation);
   }, []);
 
   const validate = () => {
@@ -66,12 +60,7 @@ const Login = ({navigation}) => {
       password: '',
     });
   };
-  () => {
-    setErrorMessages({
-      email: '',
-      password: '',
-    });
-  };
+
   const handleLogin = () => {
     if (!validate()) {
       return;
@@ -82,7 +71,7 @@ const Login = ({navigation}) => {
       .then(async () => {
         const token = await (await auth().currentUser.getIdTokenResult()).token;
         storeData('pnvoToken', token);
-        navigation.navigate('main');
+        checkTokenAndNavigate(navigation);
       })
       .catch(err => {
         let errMess = {email: '', password: ''};
@@ -107,6 +96,48 @@ const Login = ({navigation}) => {
       });
   };
 
+  const handleForgotPassword = () => {
+    if (!isForgetting) {
+      setIsForgetting(true);
+      return;
+    }
+
+    let check = true;
+    let errMess = {
+      email: '',
+      password: '',
+    };
+    if (!validateEmail(params.email)) {
+      check = false;
+      errMess.email = 'Invalid email format!';
+    }
+    if (params.email === '') {
+      check = false;
+      errMess.email = 'Required input!';
+    }
+
+    if (!check) {
+      setErrorMessages(errMess);
+      return;
+    }
+    auth()
+      .sendPasswordResetEmail(params.email)
+      .then(() => {
+        ToastAndroid.show('Email sent successfully', ToastAndroid.LONG);
+        setIsForgetting(false);
+      })
+      .catch(e => {
+        if (
+          e.message ===
+          '[auth/user-not-found] There is no user record corresponding to this identifier. The user may have been deleted.'
+        ) {
+          setErrorMessages({
+            ...errorMessages,
+            ['email']: 'Email is not corresponding to any user',
+          });
+        }
+      });
+  };
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={COLORS.primaryBg} barStyle="light-content" />
@@ -126,30 +157,59 @@ const Login = ({navigation}) => {
           handleBlur={handleBlur}
         />
 
-        <Input
-          label="Password"
-          errMess={errorMessages.password}
-          onChangeText={newText =>
-            setParams({...params, ['password']: newText})
-          }
-          defaultValue={params.password}
-          iconName={secure ? 'eye-off' : 'eye'}
-          handleBlur={handleBlur}
-          secure={secure}
-          handlePressIcon={() => {
-            setSecure(!secure);
-          }}
-        />
+        {isForgetting ? (
+          <Text style={styles.formGroupText}>
+            Please enter your email address, then check your email inbox for
+            reset password.
+          </Text>
+        ) : (
+          <Input
+            label="Password"
+            errMess={errorMessages.password}
+            onChangeText={newText =>
+              setParams({...params, ['password']: newText})
+            }
+            defaultValue={params.password}
+            iconName={secure ? 'eye-off' : 'eye'}
+            handleBlur={handleBlur}
+            secure={secure}
+            handlePressIcon={() => {
+              setSecure(!secure);
+            }}
+          />
+        )}
       </View>
 
-      <ButtonActive text="Login" handlePress={handleLogin} />
+      {!isForgetting ? (
+        <ButtonActive text="Login" handlePress={handleLogin} />
+      ) : null}
       <View style={styles.fogotAndMore}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('forgot');
-          }}>
-          <Text style={styles.forgot}>Forgot password?</Text>
-        </TouchableOpacity>
+        <View
+          style={[
+            styles.forgotBtnSection,
+            {justifyContent: isForgetting ? 'space-between' : 'center'},
+          ]}>
+          <TouchableOpacity
+            onPress={handleForgotPassword}
+            style={isForgetting ? styles.forgotBtn : styles.forgotGroup}>
+            <Text
+              style={[
+                styles.forgot,
+                {color: isForgetting ? COLORS.whiteText : COLORS.likedBtn},
+              ]}>
+              {isForgetting ? 'Send me email' : 'Forgot password?'}
+            </Text>
+          </TouchableOpacity>
+          {isForgetting ? (
+            <TouchableOpacity
+              onPress={() => {
+                setIsForgetting(false);
+              }}
+              style={styles.cancelForgotBtn}>
+              <Text style={styles.cancelForgotText}>Cancel</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
 
         <Text style={{color: COLORS.whiteText}}>OR</Text>
       </View>
@@ -202,14 +262,38 @@ const styles = StyleSheet.create({
   fogotAndMore: {
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
+  },
+  forgotBtn: {
+    backgroundColor: COLORS.likedBtn,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  forgotBtnSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 15,
   },
   forgot: {
     fontSize: 15,
-    color: COLORS.likedBtn,
-    marginBottom: 15,
+    fontWeight: '600',
   },
   groupBtnOther: {
     width: '100%',
+  },
+  cancelForgotBtn: {
+    borderWidth: 2,
+    borderColor: COLORS.likedBtn,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  cancelForgotText: {
+    color: COLORS.likedBtn,
+    fontSize: 15,
+    fontWeight: '600',
   },
   // register
   didnAccount: {

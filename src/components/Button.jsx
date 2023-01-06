@@ -6,10 +6,12 @@ const MyButton = ({
   variant = 'outlined',
   children = 'My button',
   handlePress,
+  disabled,
 }) => {
   return (
     <TouchableOpacity
       onPress={handlePress}
+      disabled={disabled || false}
       style={[
         styles.btn,
         variant === 'outlined' ? styles.outlined : styles.contained,

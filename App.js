@@ -6,7 +6,6 @@ import BottomTab from './src/routes/index';
 import Login from './src/screens/Auth/Login';
 import Register from './src/screens/Auth/Register';
 import {COLORS} from './src/utils';
-import ForgotPassword from './src/screens/Auth/Forgot';
 
 const App = () => {
   const Stack = createNativeStackNavigator();
@@ -22,20 +21,8 @@ const App = () => {
           name="register"
           component={Register}
           options={{
-            headerShown: true,
+            headerShown: false,
             headerStyle: {backgroundColor: COLORS.primaryBg},
-            title: '',
-            headerTintColor: COLORS.bgActiveBtn,
-            animation: 'slide_from_right',
-          }}
-        />
-        <Stack.Screen
-          name="forgot"
-          component={ForgotPassword}
-          options={{
-            headerShown: true,
-            headerStyle: {backgroundColor: COLORS.primaryBg},
-            title: '',
             headerTintColor: COLORS.bgActiveBtn,
             animation: 'slide_from_right',
           }}

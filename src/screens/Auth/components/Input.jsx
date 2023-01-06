@@ -17,6 +17,7 @@ const Input = props => {
           returnKeyType="next"
           onBlur={props.handleBlur}
           secureTextEntry={props.secure || false}
+          selectTextOnFocus={true}
         />
         <Icon name={props.iconName} size={28} style={styles.icon} onPress={props.handlePressIcon} />
       </View>

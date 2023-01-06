@@ -38,6 +38,20 @@ export const navigateAuthorized = navigation => {
   });
 };
 
+export const checkTokenAndNavigate = navigation => {
+  auth().onAuthStateChanged(user => {
+    (async () => {
+      const token = await getData('pnvoToken');
+      if (
+        user !== null &&
+        (await (await auth().currentUser.getIdTokenResult()).token) === token
+      ) {
+        navigateAuthorized(navigation);
+      }
+    })();
+  });
+};
+
 export const logOut = () => {
   auth()
     .signOut()
