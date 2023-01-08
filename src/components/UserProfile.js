@@ -1,8 +1,17 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
-import Background from '../image/background.jpg';
+import aDrawerIcon from '../image/app-drawer.png';
+import BellIcon from '../image/bell.png';
+import DrawerIcon from '../image/drawer.png';
+import EditIcon from '../image/edit.png';
 import Home from '../image/home.jpg';
+import HomeIcon from '../image/home.png';
+import HouseIcon from '../image/house.png';
+import ManIcon from '../image/man.png';
+import MoreIcon from '../image/more.png';
+import PlusIcon from '../image/plus.png';
+import WorkIcon from '../image/portfolio.png';
+import UserIcon from '../image/user.png';
 
 export default class UserProfile extends React.Component {
   static navigationOptions = {
@@ -13,14 +22,14 @@ export default class UserProfile extends React.Component {
       <View style={styles.container}>
         <Image source={Home} style={styles.converPhoto} />
         <View style={styles.topHeader}>
-          <Icon name="home" style={styles.headerIcons} />
-          <Icon name="user" style={styles.headerIcons} />
-          <Icon name="bell" style={styles.headerIcons} />
-          <Icon name="Drawer" style={styles.headerIcons} />
+          <Image style={styles.headerIcons} source={HomeIcon} />
+          <Image style={styles.headerIcons} source={UserIcon} />
+          <Image style={styles.headerIcons} source={BellIcon} />
+          <Image style={styles.headerIcons} source={DrawerIcon} />
         </View>
         <View style={styles.dpContainer}>
           <View style={styles.dpBlueRound}>
-            <Image style={styles.dp} source={Background} />
+            <Image style={styles.dp} source={ManIcon} />
             <View style={styles.activeNowTick}></View>
           </View>
         </View>
@@ -30,25 +39,25 @@ export default class UserProfile extends React.Component {
         <View style={styles.profileTabsContainer}>
           <View style={styles.tabContainer}>
             <View style={styles.tabImageContainer}>
-              <Icon name="plus" style={styles.tabImage} />
+              <Image style={styles.tabImage} source={PlusIcon} />
             </View>
             <Text style={styles.tabText}>Add Story</Text>
           </View>
           <View style={styles.tabContainer}>
             <View style={styles.tabImageContainer}>
-              <Icon name="edit" style={styles.tabImage} />
+              <Image style={styles.tabImage} source={EditIcon} />
             </View>
             <Text style={styles.tabText}>Edit Profile</Text>
           </View>
           <View style={styles.tabContainer}>
             <View style={styles.tabImageContainer}>
-              <Icon name="align-justify" style={styles.tabImage} />
+              <Image style={styles.tabImage} source={aDrawerIcon} />
             </View>
             <Text style={styles.tabText}>Activity Log</Text>
           </View>
           <View style={styles.tabContainer}>
             <View style={styles.tabImageContainer}>
-              <Icon name="more-horizontal" style={styles.tabImage} />
+              <Image style={styles.tabImage} source={MoreIcon} />
             </View>
             <Text style={styles.tabText}>More</Text>
           </View>
@@ -59,14 +68,14 @@ export default class UserProfile extends React.Component {
           <Text style={styles.seeAllText}>See All</Text>
         </View>
         <View style={styles.workContainer}>
-          <Icon name="briefcase" style={styles.workIcon} />
+          <Image style={styles.workIcon} source={WorkIcon} />
           <Text style={{fontSize: 18, marginLeft: 10}}>Founder at</Text>
           <Text style={{fontSize: 18, fontWeight: 'bold', marginLeft: 5}}>
             CodeGranted
           </Text>
         </View>
         <View style={styles.workContainer}>
-          <Icon name="home" style={styles.workIcon} />
+          <Image style={styles.workIcon} source={HouseIcon} />
           <Text style={{fontSize: 18, marginLeft: 10}}>Lives in</Text>
           <Text style={{fontSize: 18, fontWeight: 'bold', marginLeft: 5}}>
             Karachi, Pakistan
@@ -132,6 +141,7 @@ const styles = StyleSheet.create({
   dp: {
     height: 170,
     width: 170,
+    borderRadius: 200,
   },
   activeNowTick: {
     height: 30,
