@@ -1,13 +1,13 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import aDrawerIcon from '../image/app-drawer.png';
+import Background from '../image/background.jpg';
 import BellIcon from '../image/bell.png';
 import DrawerIcon from '../image/drawer.png';
 import EditIcon from '../image/edit.png';
 import Home from '../image/home.jpg';
 import HomeIcon from '../image/home.png';
 import HouseIcon from '../image/house.png';
-import ManIcon from '../image/man.png';
 import MoreIcon from '../image/more.png';
 import PlusIcon from '../image/plus.png';
 import WorkIcon from '../image/portfolio.png';
@@ -29,7 +29,7 @@ export default class UserProfile extends React.Component {
         </View>
         <View style={styles.dpContainer}>
           <View style={styles.dpBlueRound}>
-            <Image style={styles.dp} source={ManIcon} />
+            <Image style={styles.dp} source={Background} />
             <View style={styles.activeNowTick}></View>
           </View>
         </View>
