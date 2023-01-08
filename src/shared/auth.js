@@ -42,10 +42,7 @@ export const checkTokenAndNavigate = navigation => {
   auth().onAuthStateChanged(user => {
     (async () => {
       const token = await getData('pnvoToken');
-      if (
-        user !== null &&
-        (await (await auth().currentUser.getIdTokenResult()).token) === token
-      ) {
+      if (user !== null && (await user.getIdToken()) === token) {
         navigateAuthorized(navigation);
       }
     })();

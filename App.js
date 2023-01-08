@@ -27,7 +27,11 @@ const App = () => {
             animation: 'slide_from_right',
           }}
         />
-        <Stack.Screen name="main" component={BottomTab} />
+        <Stack.Screen
+          name="main"
+          component={BottomTab}
+          options={{headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
