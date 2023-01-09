@@ -13,7 +13,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {/* <Stack.Screen
+        <Stack.Screen
           name="login"
           component={Login}
           options={{headerShown: false}}
@@ -39,7 +39,7 @@ const App = () => {
             headerTintColor: COLORS.bgActiveBtn,
             animation: 'slide_from_right',
           }}
-        /> */}
+        />
         <Stack.Screen name="main" component={BottomTab} />
       </Stack.Navigator>
     </NavigationContainer>
