@@ -1,10 +1,10 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Home from './../screens/Home/index';
-import Feather from 'react-native-vector-icons/dist/Feather';
 import {useIsFocused} from '@react-navigation/native';
-import {Text, TouchableOpacity} from 'react-native';
-import {COLORS} from './../utils/index';
+import {Text} from 'react-native';
+import Feather from 'react-native-vector-icons/dist/Feather';
+import Home from './../screens/Home/index';
 import Account from './../screens/User/index';
+import {COLORS} from './../utils/index';
 
 const BottomTab = () => {
   const Tab = createBottomTabNavigator();
