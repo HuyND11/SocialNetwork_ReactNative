@@ -1,72 +1,60 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from './../screens/Home/index';
-import Feather from 'react-native-vector-icons/dist/Feather';
-import {useIsFocused} from '@react-navigation/native';
-import {Text, TouchableOpacity} from 'react-native';
-import {COLORS} from './../utils/index';
+import Feather from 'react-native-vector-icons/Feather';
+import {StatusBar, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {COLORS, FontSize} from './../utils/index';
 import Account from './../screens/User/index';
+import Create from '../screens/Create';
 
 const BottomTab = () => {
+  const focusIcon = isFocused => {
+    return isFocused ? styles.isFocused : styles.isUnfocused;
+  };
+  const focusText = isFocused => {
+    return isFocused ? styles.isFocusedText : styles.isUnfocusedText;
+  };
+
   const Tab = createBottomTabNavigator();
-  const isFocused = useIsFocused();
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-      }}>
+        tabBarStyle: {height: 60, backgroundColor: COLORS.primaryBg},
+      }}
+      sceneContainerStyle={{backgroundColor: COLORS.primaryBg}}>
       <Tab.Screen
         name="home"
         component={Home}
         options={() => {
           return {
-            tabBarLabel: () => {
-              return (
-                <Text
-                  style={{
-                    color: isFocused ? '#000' : '#CCC',
-                    fontWeight: '600',
-                  }}>
-                  {'Home'}
-                </Text>
-              );
+            tabBarLabel: ({focused}) => {
+              return <Text style={focusText(focused)}>Home</Text>;
             },
-            tabBarIcon: () => {
-              return (
-                <Feather
-                  name="home"
-                  size={28}
-                  color={isFocused ? COLORS.blackText : '#CCC'}
-                />
-              );
+            tabBarIcon: ({focused}) => {
+              return <Feather name="home" style={focusIcon(focused)} />;
             },
-            title: 'Home',
           };
         }}
       />
       <Tab.Screen
-        name="create"
-        component={Home}
+        name="createPost"
+        component={Create}
         options={() => {
           return {
-            tabBarLabel: () => {
-              return false;
+            tabBarLabel: ({focused}) => {
+              return <Text style={focusText(focused)}>Create</Text>;
             },
-            tabBarIcon: () => {
+            tabBarIcon: ({focused}) => {
               return (
-                // <TouchableOpacity
-                //   style={{
-                //     backgroundColor: COLORS.bgActiveBtn,
-                //     borderRadius: 99,
-                //   }}>
-
-                // </TouchableOpacity>
                 <Feather
                   name="plus"
-                  size={28}
-                  color={isFocused ? COLORS.whiteText : '#CCC'}
+                  style={
+                    focused ? styles.iconCenterFocused : styles.isUnfocused
+                  }
                 />
               );
             },
+            title: 'create',
           };
         }}
       />
@@ -75,25 +63,11 @@ const BottomTab = () => {
         component={Account}
         options={() => {
           return {
-            tabBarLabel: () => {
-              return (
-                <Text
-                  style={{
-                    color: isFocused ? COLORS.blackText : '#CCC',
-                    fontWeight: '600',
-                  }}>
-                  {'Account'}
-                </Text>
-              );
+            tabBarLabel: ({focused}) => {
+              return <Text style={focusText(focused)}>Account</Text>;
             },
-            tabBarIcon: () => {
-              return (
-                <Feather
-                  name="user"
-                  size={28}
-                  color={isFocused ? COLORS.blackText : '#CCC'}
-                />
-              );
+            tabBarIcon: ({focused}) => {
+              return <Feather name="user" style={focusIcon(focused)} />;
             },
             title: 'Home',
           };
@@ -102,5 +76,45 @@ const BottomTab = () => {
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  isFocused: {
+    color: COLORS.whiteText,
+    fontWeight: '600',
+    fontSize: 35,
+  },
+  isUnfocused: {
+    color: COLORS.greyText,
+    fontWeight: '400',
+    fontSize: 28,
+  },
+  isFocusedText: {
+    color: COLORS.whiteText,
+    fontWeight: '500',
+    fontSize: FontSize.mediumSize,
+  },
+  isUnfocusedText: {
+    color: COLORS.greyText,
+    fontWeight: '400',
+    fontSize: FontSize.mediumSize,
+  },
+  iconCenterFocused: {
+    backgroundColor: COLORS.bgActiveBtn,
+    padding: 10,
+    fontSize: 35,
+    borderRadius: 30,
+    color: COLORS.whiteText,
+    position: 'absolute',
+    top: -30,
+    shadowColor: COLORS.likedBtn,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 6.0,
+    elevation: 10,
+  },
+});
 
 export default BottomTab;

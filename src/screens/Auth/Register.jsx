@@ -13,6 +13,7 @@ import {COLORS} from '../../utils';
 import {validateEmail} from '../../shared/validateForm';
 import Input from './components/Input';
 import {ButtonActive, ButtonService} from './components/Button';
+import ButtonBack from '../../components/ButtonBack';
 
 const Register = ({navigation}) => {
   const [secure, setSecure] = useState(true);
@@ -85,6 +86,7 @@ const Register = ({navigation}) => {
   };
   return (
     <View style={styles.container}>
+    <ButtonBack navigation={navigation} />
       <Image
         source={require('../../assets/images/logo.png')}
         style={styles.logo}
@@ -160,6 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primaryBg,
     paddingHorizontal: 15,
     paddingVertical: 20,
+    position: 'relative',
   },
   logo: {
     width: '50%',
