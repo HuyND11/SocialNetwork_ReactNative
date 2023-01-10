@@ -54,6 +54,7 @@ function useFirestoreCollection(collection, pageSize, page) {
     return () => unsubscribe();
   }, [query]);
 
+
   function refresh() {
     if (query) {
       setQueryLoading(true);
