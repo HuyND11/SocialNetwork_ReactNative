@@ -1,13 +1,13 @@
 import {Image, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
-const PostImage = () => {
+const PostImage = ({link}) => {
   return (
     <View style={styles.container}>
       <Image
         style={styles.image}
         source={{
-          uri: 'https://upload.wikimedia.org/wikipedia/vi/2/25/Monkey_D._Luffy%2C_post_time-skip%2C_OP.png',
+          uri: link,
         }}
       />
     </View>

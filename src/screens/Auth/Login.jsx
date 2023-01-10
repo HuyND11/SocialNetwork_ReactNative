@@ -66,6 +66,8 @@ const Login = ({navigation}) => {
       return;
     }
 
+    console.log('login');
+
     auth()
       .signInWithEmailAndPassword(params.email, params.password)
       .then(async () => {

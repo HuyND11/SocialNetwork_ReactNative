@@ -5,13 +5,19 @@ import PostContent from './PostContent';
 import PostImage from './PostImage';
 import ReactBar from './ReactBar';
 
-const Post = () => {
+const Post = ({UID, content = 'PNVO', listImage, listLike}) => {
+  // console.log(listImage);
   return (
     <View style={styles.container}>
       <UserInfo />
-      <PostContent> asdjksfskajhsfkjs</PostContent>
-      <PostImage />
-      <ReactBar />
+      <PostContent>{content}</PostContent>
+      <View style={styles.containerImage}>
+        {listImage?.map((ele, index) => (
+          <PostImage key={index} link={ele} />
+        ))}
+      </View>
+
+      <ReactBar list={listLike} />
     </View>
   );
 };
@@ -20,7 +26,10 @@ export default Post;
 
 const styles = StyleSheet.create({
   container: {
-    // paddingHorizontal: 10,
     paddingVertical: 10,
+  },
+
+  containerImage: {
+    // flexDirection: 'row',
   },
 });
