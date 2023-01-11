@@ -1,14 +1,14 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import Logo from './Logo';
 import Entypo from 'react-native-vector-icons/dist/Entypo';
-import Fontisto from 'react-native-vector-icons/dist/Fontisto';
+import Fontisto from 'react-native-vector-icons/Fontisto';
 import {COLORS} from '../utils';
 
 const Header = () => {
   return (
     <View style={styles.container}>
-      <Logo />
+      <Image source={require('../assets/images/logo.png')}
+      style={styles.logo} />
       <View style={styles.leftContainer}>
         <Entypo
           style={styles.icon}
@@ -47,4 +47,9 @@ const styles = StyleSheet.create({
   icon: {
     margin: 5,
   },
+  logo: {
+    width: 80,
+    height: 50,
+    marginTop: 10,
+  }
 });

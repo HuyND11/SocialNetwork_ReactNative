@@ -6,7 +6,6 @@ import PostImage from './PostImage';
 import ReactBar from './ReactBar';
 
 const Post = ({UID, content = 'PNVO', listImage, listLike}) => {
-  // console.log(listImage);
   return (
     <View style={styles.container}>
       <UserInfo />

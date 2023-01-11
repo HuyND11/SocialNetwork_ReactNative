@@ -2,16 +2,16 @@ import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Avatar from './Avatar';
 import {COLORS, FontSize} from './../utils/index';
-import AntDesign from 'react-native-vector-icons/dist/AntDesign';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
-const UserInfo = () => {
+const UserInfo = ({userInfo, post}) => {
   return (
     <View style={styles.container}>
       <Avatar />
       <View style={styles.containerInfo}>
-        <Text style={styles.name}>Huynd</Text>
+        <Text style={styles.name}>{userInfo.userName}</Text>
         <View style={styles.containerTime}>
-          <Text style={styles.time}>19 giờ</Text>
+          <Text style={styles.time}>{post.createAt}</Text>
           <AntDesign
             name="clockcircleo"
             size={FontSize.smallSize}
