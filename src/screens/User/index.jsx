@@ -2,13 +2,15 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import MyButton from '../../components/Button';
 import {getData, getUid, logOut} from '../../shared/auth';
 import {COLORS, FontSize} from '../../utils';
@@ -17,15 +19,23 @@ import firestore from '@react-native-firebase/firestore';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
 import Icon from 'react-native-vector-icons/Feather';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import FormEdit from './components/FormEdit';
+import UploadImage from './components/UploadImage';
 
 const Account = ({navigation}) => {
   const collection = firestore().collection('users');
   const [userInfo, setUserInfo] = useState({});
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [objImage, setObjImage] = useState('');
+  const [modalVisile, setModalVisible] = useState(false);
   const {data, loading, error, refresh} = useFirestoreCollection(
     collection,
     6,
     2,
   );
+  const refRBSheet = useRef();
+  const refRBSIMG = useRef();
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -35,20 +45,14 @@ const Account = ({navigation}) => {
       }
     };
     getUserInfo();
-  }, [loading]);
+  }, [loading, isUpdate]);
 
   if (loading) {
     return <ActivityIndicator size="large" color={COLORS.bgActiveBtn} />;
-  } else {
-    console.log('userInfo', userInfo);
   }
   if (error) {
     return <Text>{error.message}</Text>;
   }
-
-  const chooseImage = () => {
-    console.log('choose image');
-  };
 
   const ListAvatarFriend = () => {
     let arr = [];
@@ -59,19 +63,18 @@ const Account = ({navigation}) => {
         }
       });
     }
-    console.log('arr', arr);
-    return arr.map(user => (
-      <View key={user.UID} style={styles.friendItem}>
+    return arr.map((user, index) => (
+      <View key={index} style={styles.friendItem}>
         <Image
           source={{
             uri:
-              user.avatar !== ''
-                ? user.avatar
+              user?.avatar !== ''
+                ? user?.avatar
                 : 'https://firebasestorage.googleapis.com/v0/b/socialfacebook-5f9df.appspot.com/o/users%2Fdefault-avatar.png?alt=media&token=7ad2115a-315a-497c-928a-df1c0e41fccc',
           }}
           style={styles.friendImage}
         />
-        <Text style={styles.friendText}>{user.userName}</Text>
+        <Text style={styles.friendText}>{user?.userName}</Text>
       </View>
     ));
   };
@@ -89,38 +92,82 @@ const Account = ({navigation}) => {
         )}
         <TouchableOpacity
           style={[styles.btnEditImage, styles.btnEditCoverImage]}
-          onPress={() => console.log('edit cover image')}>
+          onPress={() => {
+            setObjImage('coverImage')
+            refRBSIMG.current.open();
+          }}>
           <Icon name="camera" size={20} color={COLORS.bgActiveBtn} />
         </TouchableOpacity>
       </LinearGradient>
       <View style={styles.avatarSection}>
         <Image
           source={{
-            uri: 'https://firebasestorage.googleapis.com/v0/b/socialfacebook-5f9df.appspot.com/o/users%2F69ed2114-f8a4-4858-91e4-c47928ebcbe4.jpg?alt=media&token=41c2fd11-3728-4458-80de-59ae38c76ea2',
+            uri: userInfo.avatar
+              ? userInfo.avatar
+              : 'https://firebasestorage.googleapis.com/v0/b/socialfacebook-5f9df.appspot.com/o/users%2Fdefault-avatar.png?alt=media&token=7ad2115a-315a-497c-928a-df1c0e41fccc',
           }}
           style={styles.avatar}
         />
         <TouchableOpacity
           style={[styles.btnEditImage, styles.btnEditAvatarImage]}
-          onPress={() => console.log('edit avatar image')}>
+          onPress={() => {
+            setObjImage('avatar');
+            refRBSIMG.current.open();
+          }}>
           <Icon name="camera" size={20} color={COLORS.bgActiveBtn} />
         </TouchableOpacity>
       </View>
       <Text style={styles.name}>{userInfo.userName}</Text>
       <View style={styles.groupBtn}>
-        <TouchableOpacity style={[styles.btn, styles.btnEdit]}>
+        <TouchableOpacity
+          style={[styles.btn, styles.btnEdit]}
+          onPress={() => refRBSheet.current.open()}>
           <Icon name="edit" size={24} color={COLORS.whiteText} />
           <Text style={styles.btnEditText}>Edit Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.btn, styles.btnLogout]}
           onPress={() => {
-            logOut(navigation);
+            setModalVisible(true);
           }}>
           <Icon name="log-out" size={24} color={COLORS.bgActiveBtn} />
           <Text style={styles.btnLogoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={modalVisile}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => {
+          ToastAndroid.show('Closed!', ToastAndroid.SHORT);
+          setModalVisible(false);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalViewText}>
+              Are you sure you want to logout?
+            </Text>
+            <View style={styles.btnModalGroup}>
+              <TouchableOpacity
+                onPress={() => logOut(navigation)}
+                style={styles.btnModalYes}>
+                <Text
+                  style={[styles.modalViewText, {color: COLORS.bgActiveBtn}]}>
+                  Yes
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.btnModalNo}>
+                <Text style={[styles.modalViewText, {color: COLORS.whiteText}]}>
+                  No
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <View style={styles.personalInfo}>
         <View style={styles.infoSection}>
@@ -166,6 +213,54 @@ const Account = ({navigation}) => {
           <ListAvatarFriend />
         </View>
       </View>
+
+      <RBSheet
+        ref={refRBSheet}
+        closeOnDragDown={true}
+        animationType="slide"
+        minClosingHeight={20}
+        customStyles={{
+          container: {
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            height: Dimensions.get('window').height - 200,
+            borderTopLeftRadius: 23,
+            borderTopRightRadius: 23,
+            backgroundColor: COLORS.bgActiveBtn,
+          },
+        }}>
+        <FormEdit
+          userInfo={userInfo}
+          refBTS={refRBSheet}
+          idDoc={userInfo.id}
+          refreshData={() => setIsUpdate(!isUpdate)}
+        />
+      </RBSheet>
+
+      <RBSheet
+        ref={refRBSIMG}
+        closeOnDragDown={true}
+        animationType="slide"
+        minClosingHeight={20}
+        customStyles={{
+          container: {
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            height: 600,
+            borderTopLeftRadius: 23,
+            borderTopRightRadius: 23,
+            backgroundColor: COLORS.bgActiveBtn,
+          },
+        }}>
+        <UploadImage
+          navigation={navigation}
+          idDoc={userInfo.id}
+          refreshData={() => setIsUpdate(!isUpdate)}
+          refRBSIMG={refRBSIMG}
+          userInfo={userInfo}
+          objImage={objImage}
+        />
+      </RBSheet>
     </View>
   );
 };
@@ -323,5 +418,53 @@ const styles = StyleSheet.create({
     color: COLORS.whiteText,
     fontSize: FontSize.mediumSize,
     fontWeight: '500',
+  },
+  // modal
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#00000099',
+  },
+  modalView: {
+    backgroundColor: COLORS.secondaryBg,
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 40,
+    alignItems: 'center',
+    shadowColor: COLORS.whiteText,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '80%',
+  },
+  modalViewText: {
+    color: COLORS.blackText,
+    fontWeight: '600',
+    fontSize: FontSize.largeSize,
+  },
+  btnModalYes: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 4,
+    borderColor: COLORS.bgActiveBtn,
+    borderWidth: 1,
+  },
+  btnModalNo: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 4,
+    backgroundColor: COLORS.bgActiveBtn,
+    marginLeft: 40,
+  },
+  btnModalGroup: {
+    flexDirection: 'row',
+    marginTop: 20,
+    width: '100%',
+    justifyContent: 'center',
   },
 });

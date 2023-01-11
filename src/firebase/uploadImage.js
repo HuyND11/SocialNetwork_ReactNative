@@ -8,6 +8,9 @@ export const pickImage = () => {
 };
 
 export const uploadImageToDirectory = async (directory, image) => {
+  if (image === undefined || image === null) {
+    return;
+  }
   let imgUrl;
   const imageName = image.path.substring(image.path.lastIndexOf('/') + 1);
   const pathToSave = `${directory}/${imageName}`;

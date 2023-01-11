@@ -9,11 +9,13 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import auth from '@react-native-firebase/auth';
-import {COLORS} from '../../utils';
+import {COLORS, notificationAndroid} from '../../utils';
 import {validateEmail} from '../../shared/validateForm';
 import Input from './components/Input';
+import firestore from '@react-native-firebase/firestore';
 import {ButtonActive, ButtonService} from './components/Button';
 import ButtonBack from '../../components/ButtonBack';
+import {BASE_USER} from '../../firebase/collectionProperties';
 
 const Register = ({navigation}) => {
   const [secure, setSecure] = useState(true);
@@ -69,8 +71,17 @@ const Register = ({navigation}) => {
     auth()
       .createUserWithEmailAndPassword(params.email, params.password)
       .then(async () => {
-        await auth().currentUser.updateProfile({displayName: params.username});
-        navigation.navigate('login');
+        let userProperties = BASE_USER;
+        const uid = await auth().currentUser.uid;
+        userProperties.UID = uid;
+        userProperties.userName = params.username;
+        firestore()
+          .collection('users')
+          .add(userProperties)
+          .then(() => {
+            notificationAndroid('Registered successfully');
+            navigation.navigate('login');
+          });
       })
       .catch(err => {
         if (
@@ -86,7 +97,7 @@ const Register = ({navigation}) => {
   };
   return (
     <View style={styles.container}>
-    <ButtonBack navigation={navigation} />
+      <ButtonBack navigation={navigation} />
       <Image
         source={require('../../assets/images/logo.png')}
         style={styles.logo}
