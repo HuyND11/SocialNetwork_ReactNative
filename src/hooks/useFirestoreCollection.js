@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
+import {firestore} from '@react-native-firebase/firestore';
 
-function useFirestoreCollection(collection, pageSize, page) {
+function useFirestoreCollection(collection) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,29 +31,27 @@ function useFirestoreCollection(collection, pageSize, page) {
         },
       );
     } else {
-      unsubscribe = collection
-        .limit(pageSize)
-        // .offset(page * pageSize)
-        .onSnapshot(
-          collectionSnapshot => {
-            const data = [];
-            collectionSnapshot.forEach(doc => {
-              data.push({
-                id: doc.id,
-                ...doc.data(),
-              });
+      setLoading(true);
+      unsubscribe = collection.onSnapshot(
+        collectionSnapshot => {
+          const data = [];
+          collectionSnapshot.forEach(doc => {
+            data.push({
+              id: doc.id,
+              ...doc.data(),
             });
-            setData(data);
-            setLoading(false);
-          },
-          error => {
-            setError(error);
-            setLoading(false);
-          },
-        );
+          });
+          setData(data);
+          setLoading(false);
+        },
+        error => {
+          setError(error);
+          setLoading(false);
+        },
+      );
     }
     return () => unsubscribe();
-  }, [query]);
+  }, [collection, query]);
 
 
   function refresh() {
@@ -76,27 +75,24 @@ function useFirestoreCollection(collection, pageSize, page) {
         },
       );
     } else {
-      collection
-        .limit(pageSize)
-        // .offset(page * pageSize)
-        .get()
-        .then(
-          collectionSnapshot => {
-            const data = [];
-            collectionSnapshot.forEach(doc => {
-              data.push({
-                id: doc.id,
-                ...doc.data(),
-              });
+      setLoading(true);
+      collection.get().then(
+        collectionSnapshot => {
+          const data = [];
+          collectionSnapshot.forEach(doc => {
+            data.push({
+              id: doc.id,
+              ...doc.data(),
             });
-            setData(data);
-            setLoading(false);
-          },
-          error => {
-            setError(error);
-            setLoading(false);
-          },
-        );
+          });
+          setData(data);
+          setLoading(false);
+        },
+        error => {
+          setError(error);
+          setLoading(false);
+        },
+      );
     }
   }
 

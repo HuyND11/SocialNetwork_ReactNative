@@ -19,11 +19,7 @@ const BottomTab = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          height: 60,
-          backgroundColor: COLORS.primaryBg,
-          borderTopWidth: 0,
-        },
+        tabBarStyle: {height: 60, backgroundColor: COLORS.primaryBg},
       }}
       sceneContainerStyle={{backgroundColor: COLORS.primaryBg}}>
       <Tab.Screen

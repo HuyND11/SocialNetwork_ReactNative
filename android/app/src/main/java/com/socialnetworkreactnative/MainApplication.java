@@ -13,7 +13,6 @@ import com.socialnetworkreactnative.newarchitecture.MainApplicationReactNativeHo
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.oblador.vectoricons.VectorIconsPackage;
-import com.BV.LinearGradient.LinearGradientPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
