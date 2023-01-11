@@ -10,3 +10,12 @@ export const BASE_USER = {
   updatedAt: '',
   userName: '',
 };
+
+export const BASE_POST = {
+  UID: '',
+  content: '',
+  image: [],
+  like: [],
+  createdAt: '',
+  updatedAt: '',
+};
