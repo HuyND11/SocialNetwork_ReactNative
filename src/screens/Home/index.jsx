@@ -22,6 +22,8 @@ const Home = () => {
     refresh();
   }, []);
 
+  console.log('data =>', data);
+
   // if (loading) {
   //   return <Text>Loading...</Text>;
   // }

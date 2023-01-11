@@ -6,18 +6,19 @@ import {
   TextInput,
   Image,
   Button,
-  Alert,
 } from 'react-native';
 import React, {useRef, useState} from 'react';
 import Feather from 'react-native-vector-icons/dist/Feather';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Modalize} from 'react-native-modalize';
-import storage from '@react-native-firebase/storage';
+import {uploadImageToDirectory} from './../../firebase/uploadImage';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 const Create = ({navigation}) => {
   const [images, setImages] = useState([]);
-  const [uploading, setUploading] = useState(false);
-  const [transferred, setTransferred] = useState(0);
+  const [content, setContent] = useState('');
+  const [UID, setUID] = useState(null);
 
   const modalizeRef = useRef(null);
 
@@ -32,7 +33,7 @@ const Create = ({navigation}) => {
       cropping: true,
       mediaType: 'image',
     }).then(image => {
-      setImages(prev => [...prev, image.path]);
+      setImages(prev => [...prev, image]);
     });
   };
 
@@ -43,13 +44,39 @@ const Create = ({navigation}) => {
       cropping: true,
       mediaType: 'image',
     }).then(image => {
-      setImages(prev => [...prev, image.path]);
+      setImages(prev => [...prev, image]);
     });
   };
 
-  // console.log('images =>', images);
+  auth().onAuthStateChanged(user => {
+    setUID(user.uid);
+  });
 
-  const handleSavePost = async () => {};
+  const handleSavePost = async () => {
+    if (images.length === 0) {
+      return null;
+    }
+    const listImage = [];
+
+    images.map(async ele => {
+      console.log('ele =>', ele);
+      const imgUrl = await uploadImageToDirectory('posts', ele);
+      console.log('imgUrl =>', imgUrl);
+      listImage.push(imgUrl);
+      console.log('listImage =>', listImage);
+    });
+
+    firestore()
+      .collection('post')
+      .add({
+        UID,
+        content: content,
+        image: listImage,
+        like: [],
+        createdAt: firestore.Timestamp.fromDate(new Date()),
+        updatedAt: firestore.Timestamp.fromDate(new Date()),
+      });
+  };
 
   return (
     <View style={styles.container}>
@@ -57,8 +84,11 @@ const Create = ({navigation}) => {
         <Text style={{fontSize: 24}}>ADD NEW POST</Text>
         <TextInput
           placeholder={"What's on your mind"}
-          onChangeText={val => {}}
-          // value=
+          
+          onChangeText={val => {
+            setContent(val.target.value);
+          }}
+          value={content}
         />
         <TouchableOpacity
           style={{alignItems: 'center', justifyContent: 'center'}}
@@ -79,9 +109,7 @@ const Create = ({navigation}) => {
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => handleSavePost()}
-          style={styles.postButton}>
+        <TouchableOpacity onPress={handleSavePost} style={styles.postButton}>
           <Feather name="corner-left-up" size={24} color="white" />
           <Text style={styles.postButtonText}>Post</Text>
         </TouchableOpacity>
