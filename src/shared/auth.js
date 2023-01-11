@@ -43,14 +43,18 @@ export const checkTokenAndNavigate = navigation => {
     (async () => {
       const token = await getData('pnvoToken');
       if (user !== null && (await user.getIdToken()) === token) {
+        storeData('pnvoUid', user.uid);
         navigateAuthorized(navigation);
       }
     })();
   });
 };
 
-export const logOut = () => {
+export const logOut = navigation => {
   auth()
     .signOut()
-    .then(() => AsyncStorage.removeItem('pnvoToken'));
+    .then(() => {
+      AsyncStorage.removeItem('pnvoToken');
+      navigation.navigate('login');
+    });
 };
