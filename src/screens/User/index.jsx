@@ -122,8 +122,7 @@ const Account = ({navigation}) => {
         <TouchableOpacity
           style={[styles.btn, styles.btnEdit]}
           onPress={() => {
-            // refRBSheet.current.open();
-            logOut();
+            refRBSheet.current.open();
           }}>
           <Icon name="edit" size={24} color={COLORS.whiteText} />
           <Text style={styles.btnEditText}>Edit Profile</Text>
