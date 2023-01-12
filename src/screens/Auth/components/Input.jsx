@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     color: COLORS.whiteText,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   icon: {
     color: COLORS.whiteText,

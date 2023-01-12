@@ -8,7 +8,7 @@ import {useEffect} from 'react';
 const Home = () => {
   const collection = firestore().collection('post');
 
-  const pageSize = 6;
+  const pageSize = 10;
 
   const page = 2;
 
@@ -22,26 +22,13 @@ const Home = () => {
     refresh();
   }, []);
 
-  console.log('data =>', data);
-
-  // if (loading) {
-  //   return <Text>Loading...</Text>;
-  // }
 
   if (error) {
     return <Text>Error: {error.message}</Text>;
   }
 
   const renderItem = ({item}) => {
-    return (
-      <Post
-        content={item?.content}
-        UID={item?.UID}
-        listImage={item?.image}
-        key={item?.id}
-        listLike={item?.like}
-      />
-    );
+    return <Post postItem={item} />;
   };
 
   return (
@@ -51,8 +38,8 @@ const Home = () => {
         data={data}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+        showsVerticalScrollIndicator={false}
       />
-
     </View>
   );
 };
@@ -62,6 +49,6 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 10,
-    paddingBottom: 40,
+    marginBottom: 60,
   },
 });

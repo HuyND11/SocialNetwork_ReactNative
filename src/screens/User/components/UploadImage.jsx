@@ -9,7 +9,7 @@ import {
 import React, {useState} from 'react';
 import {pickImage, uploadImageToDirectory} from '../../../firebase/uploadImage';
 import firestore from '@react-native-firebase/firestore';
-import {COLORS, FontSize, notificationAndroid} from '../../../utils';
+import {COLORS, defaultImages, FontSize, notificationAndroid} from '../../../utils';
 
 const UploadImage = ({userInfo, idDoc, refreshData, refRBSIMG, objImage}) => {
   const [image, setImage] = useState(null);
@@ -20,7 +20,7 @@ const UploadImage = ({userInfo, idDoc, refreshData, refRBSIMG, objImage}) => {
 
   const uploadImage = async () => {
     setLoading(true);
-    const imgUrl = await uploadImageToDirectory('posts', image);
+    const imgUrl = await uploadImageToDirectory('users', image);
     if (objImage === 'avatar') {
       firestore()
         .collection('users')
@@ -69,7 +69,7 @@ const UploadImage = ({userInfo, idDoc, refreshData, refRBSIMG, objImage}) => {
       firestore()
         .collection('users')
         .doc(idDoc)
-        .update({coverImage: 'imgUrl'})
+        .update({coverImage: ''})
         .then(() => {
           notificationAndroid('Cover image deleted');
           refreshData();
@@ -115,7 +115,7 @@ const UploadImage = ({userInfo, idDoc, refreshData, refRBSIMG, objImage}) => {
         ) : (
           <Image
             source={{
-              uri: 'https://firebasestorage.googleapis.com/v0/b/socialfacebook-5f9df.appspot.com/o/users%2Fdefault-avatar.png?alt=media&token=7ad2115a-315a-497c-928a-df1c0e41fccc',
+              uri: defaultImages.DEFAULT_AVATAR,
             }}
             style={styles.imagePreview}
           />
@@ -130,7 +130,7 @@ const UploadImage = ({userInfo, idDoc, refreshData, refRBSIMG, objImage}) => {
       ) : (
         <Image
           source={{
-            uri: 'https://firebasestorage.googleapis.com/v0/b/socialfacebook-5f9df.appspot.com/o/users%2Fdefault_image_cover.png?alt=media&token=a53c983f-69dd-47e2-b2da-1b2cde5f8298',
+            uri: defaultImages.DEFAULT_IMAGE_UPLOAD,
           }}
           style={styles.imagePreview}
         />
@@ -141,7 +141,7 @@ const UploadImage = ({userInfo, idDoc, refreshData, refRBSIMG, objImage}) => {
           disabled={image ? false : true}
           style={[
             styles.btn,
-            {backgroundColor: image ? COLORS.bgActiveBtn : COLORS.bgDisabled},
+            {backgroundColor: image ? COLORS.bgActiveBtn : COLORS.greyText},
           ]}>
           <Text style={[styles.textBtn, {color: COLORS.whiteText}]}>
             Update {objImage === 'avatar' ? 'Avatar' : 'Cover image'}

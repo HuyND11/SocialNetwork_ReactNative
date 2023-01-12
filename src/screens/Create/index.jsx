@@ -1,182 +1,190 @@
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
+  ActivityIndicator,
   Image,
-  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
-import Feather from 'react-native-vector-icons/dist/Feather';
-import ImagePicker from 'react-native-image-crop-picker';
-import {Modalize} from 'react-native-modalize';
-import {uploadImageToDirectory} from './../../firebase/uploadImage';
+import React, {useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/Feather';
+import Input from '../Auth/components/Input';
+import {COLORS, FontSize, notificationAndroid} from '../../utils';
+import {ButtonActive} from '../Auth/components/Button';
+import {BASE_POST, dateTimeFormat} from '../../firebase/collectionProperties';
+import {
+  pickMultipleImage,
+  uploadImageToDirectory,
+} from '../../firebase/uploadImage';
+import {getData} from '../../shared/auth';
 
 const Create = ({navigation}) => {
-  const [images, setImages] = useState([]);
   const [content, setContent] = useState('');
-  const [UID, setUID] = useState(null);
 
-  const modalizeRef = useRef(null);
-
-  const onOpen = () => {
-    modalizeRef.current.open();
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const chooseImage = () => {
+    pickMultipleImage().then(images => setImages(images));
   };
 
-  const handleMakeImage = () => {
-    ImagePicker.openCamera({
-      width: 1200,
-      height: 780,
-      cropping: true,
-      mediaType: 'image',
-    }).then(image => {
-      setImages(prev => [...prev, image]);
-    });
-  };
+  // const handleUploadImage = () => {
+  //   let imageArr = [];
+  //   if (images.length !== 0) {
+  //     images.forEach(async img => {
+  //       const imgUrl = await uploadImageToDirectory('tests', img);
+  //       await imageArr.push(imgUrl);
+  //     });
+  //     return imageArr;
+  //   } else {
+  //     return [];
+  //   }
+  // };
 
-  const handleChooseImage = () => {
-    ImagePicker.openPicker({
-      width: 1200,
-      height: 780,
-      cropping: true,
-      mediaType: 'image',
-    }).then(image => {
-      setImages(prev => [...prev, image]);
-    });
-  };
-
-  auth().onAuthStateChanged(user => {
-    setUID(user.uid);
-  });
-
-  const handleSavePost = async () => {
-    if (images.length === 0) {
-      return null;
+  const handleCreate = async () => {
+    setIsLoading(true);
+    let postParams = BASE_POST;
+    postParams.UID = await getData('pnvoUid');
+    postParams.createdAt = new Date().toLocaleDateString(
+      'en-US',
+      dateTimeFormat,
+    );
+    if (images.length !== 0) {
+      postParams.image = [await uploadImageToDirectory('posts', images[0])];
+    } else {
+      imageArr = [''];
     }
-    const listImage = [];
 
-    images.map(async ele => {
-      console.log('ele =>', ele);
-      const imgUrl = await uploadImageToDirectory('posts', ele);
-      console.log('imgUrl =>', imgUrl);
-      listImage.push(imgUrl);
-      console.log('listImage =>', listImage);
-    });
+    postParams.content = content;
 
+    console.log('postParams', postParams);
     firestore()
       .collection('post')
-      .add({
-        UID,
-        content: content,
-        image: listImage,
-        like: [],
-        createdAt: firestore.Timestamp.fromDate(new Date()),
-        updatedAt: firestore.Timestamp.fromDate(new Date()),
+      .add(postParams)
+      .then(() => {
+        notificationAndroid('Post has been created');
+        setContent('');
+        setImages([]);
+        navigation.navigate('home');
       });
   };
-
   return (
     <View style={styles.container}>
-      <View style={{alignItems: 'center', justifyContent: 'center'}}>
-        <Text style={{fontSize: 24}}>ADD NEW POST</Text>
-        <TextInput
-          placeholder={"What's on your mind"}
-          
-          onChangeText={val => {
-            setContent(val.target.value);
-          }}
-          value={content}
-        />
-        <TouchableOpacity
-          style={{alignItems: 'center', justifyContent: 'center'}}
-          onPress={onOpen}>
-          <Feather name={'image'} color={'black'} size={30} />
-          <Text>Add image</Text>
-        </TouchableOpacity>
-        <View style={{width: 350, marginTop: 30, marginBottom: 30}}>
-          <Text style={{marginBottom: 20}}>Content:</Text>
+      {isLoading ? <ActivityIndicator style={styles.loading} size="large" /> : null}
+      <View style={styles.groupForm}>
+        <View style={styles.groupInput}>
+          <Text style={styles.inputLabel}>Content of your post</Text>
+          <View style={styles.inputIcon}>
+            <TextInput
+              style={styles.input}
+              onChangeText={newText => setContent(newText)}
+              defaultValue={content}
+              multiline={true}
+              numberOfLines={5}
+            />
+            <Icon name="edit-2" size={28} style={styles.icon} />
+          </View>
         </View>
-      </View>
-      <View style={styles.spacer} />
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.cancelButton}>
-          <Feather name="x" size={24} color="black" />
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+
+        <TouchableOpacity style={styles.btnSelect} onPress={chooseImage}>
+          <Text style={styles.textSelect}>Select image</Text>
+          <Icon name="image" size={28} color={COLORS.bgActiveBtn} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleSavePost} style={styles.postButton}>
-          <Feather name="corner-left-up" size={24} color="white" />
-          <Text style={styles.postButtonText}>Post</Text>
-        </TouchableOpacity>
-      </View>
-      <Modalize
-        ref={modalizeRef}
-        modalHeight={200}
-        handlePosition={'inside'}
-        onClose={() => {}}>
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <View style={{width: 300, marginTop: 30}}>
-            <Button title={'Choose a image'} onPress={handleChooseImage} />
-          </View>
-          <View style={{width: 300, marginTop: 10}}>
-            <Button title={'Make a image'} onPress={handleMakeImage} />
-          </View>
+        <View style={styles.imagesPreviewList}>
+          {images.length !== 0
+            ? images.map((img, index) => (
+                <Image
+                  key={img.path}
+                  source={{
+                    uri: img.path,
+                  }}
+                  style={[styles.imagePreview, {flex: index + 1}]}
+                />
+              ))
+            : null}
         </View>
-      </Modalize>
+
+        <ButtonActive handlePress={handleCreate} text="Create post" />
+      </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
+export default Create;
 
-  buttonsContainer: {
-    flexDirection: 'row',
-    margin: 20,
+const styles = StyleSheet.create({
+  groupForm: {
+    marginTop: 30,
   },
-  cancelButton: {
-    alignItems: 'center',
+  loading: {
+    position: 'absolute',
+    top: '45%',
+    left: '50%',
+    color: COLORS.bgActiveBtn,
+  },
+  container: {
+    backgroundColor: COLORS.primaryBg,
     flex: 1,
-    borderColor: 'lightgray',
-    borderWidth: 1,
+    width: '100%',
+    paddingHorizontal: 15,
+  },
+  groupInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.secondaryBg,
+    width: '100%',
+    marginBottom: 20,
+  },
+  inputIcon: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  input: {
+    color: COLORS.whiteText,
+    fontSize: 18,
+    width: '90%',
+  },
+  inputLabel: {
+    color: COLORS.whiteText,
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  icon: {
+    color: COLORS.whiteText,
+  },
+  btnSelect: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '45%',
+    borderWidth: 2,
+    borderColor: COLORS.bgActiveBtn,
+    borderRadius: 4,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    justifyContent: 'center',
-    borderRadius: 4,
-    marginRight: 10,
+    marginBottom: 20,
   },
-  postButton: {
-    alignItems: 'center',
-    flex: 1,
-    backgroundColor: '#ff4040',
+  textSelect: {
+    fontWeight: '500',
+    fontSize: FontSize.largeSize,
+    color: COLORS.bgActiveBtn,
+  },
+  imagesPreviewList: {
     flexDirection: 'row',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
     justifyContent: 'center',
-    borderRadius: 4,
-    marginRight: 10,
+    alignItems: 'center',
+    width: '100%',
+    maxHeight: 400,
+    overflow: 'hidden',
+    borderRadius: 10,
   },
-  cancelButtonText: {
-    marginLeft: 5,
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  postButtonText: {
-    marginLeft: 5,
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
+  imagePreview: {
+    width: '100%',
+    maxHeight: 300,
+    borderRadius: 10,
+    resizeMode: 'cover',
+    marginHorizontal: 5,
   },
 });
-
-export default Create;

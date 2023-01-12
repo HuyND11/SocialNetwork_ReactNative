@@ -13,7 +13,7 @@ import {
 import React, {useEffect, useRef, useState} from 'react';
 import MyButton from '../../components/Button';
 import {getData, getUid, logOut} from '../../shared/auth';
-import {COLORS, FontSize} from '../../utils';
+import {COLORS, defaultImages, FontSize} from '../../utils';
 import LinearGradient from 'react-native-linear-gradient';
 import firestore from '@react-native-firebase/firestore';
 import useFirestoreCollection from '../../hooks/useFirestoreCollection';
@@ -93,7 +93,7 @@ const Account = ({navigation}) => {
         <TouchableOpacity
           style={[styles.btnEditImage, styles.btnEditCoverImage]}
           onPress={() => {
-            setObjImage('coverImage')
+            setObjImage('coverImage');
             refRBSIMG.current.open();
           }}>
           <Icon name="camera" size={20} color={COLORS.bgActiveBtn} />
@@ -104,7 +104,7 @@ const Account = ({navigation}) => {
           source={{
             uri: userInfo.avatar
               ? userInfo.avatar
-              : 'https://firebasestorage.googleapis.com/v0/b/socialfacebook-5f9df.appspot.com/o/users%2Fdefault-avatar.png?alt=media&token=7ad2115a-315a-497c-928a-df1c0e41fccc',
+              : defaultImages.DEFAULT_AVATAR,
           }}
           style={styles.avatar}
         />
@@ -121,7 +121,10 @@ const Account = ({navigation}) => {
       <View style={styles.groupBtn}>
         <TouchableOpacity
           style={[styles.btn, styles.btnEdit]}
-          onPress={() => refRBSheet.current.open()}>
+          onPress={() => {
+            // refRBSheet.current.open();
+            logOut();
+          }}>
           <Icon name="edit" size={24} color={COLORS.whiteText} />
           <Text style={styles.btnEditText}>Edit Profile</Text>
         </TouchableOpacity>

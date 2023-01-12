@@ -19,3 +19,12 @@ export const BASE_POST = {
   createdAt: '',
   updatedAt: '',
 };
+
+export const dateTimeFormat = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+};

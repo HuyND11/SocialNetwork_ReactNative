@@ -7,6 +7,12 @@ export const pickImage = () => {
   });
 };
 
+export const pickMultipleImage = () => {
+  return ImageCropPicker.openPicker({
+    multiple: true,
+  });
+};
+
 export const uploadImageToDirectory = async (directory, image) => {
   if (image === undefined || image === null) {
     return;

@@ -30,24 +30,26 @@ function useFirestoreCollection(collection, pageSize, page) {
         },
       );
     } else {
-      setLoading(true);
-      unsubscribe = collection.limit(pageSize).onSnapshot(
-        collectionSnapshot => {
-          const data = [];
-          collectionSnapshot.forEach(doc => {
-            data.push({
-              id: doc.id,
-              ...doc.data(),
+      unsubscribe = collection
+        .limit(pageSize)
+        // .offset(page * pageSize)
+        .onSnapshot(
+          collectionSnapshot => {
+            const data = [];
+            collectionSnapshot.forEach(doc => {
+              data.push({
+                id: doc.id,
+                ...doc.data(),
+              });
             });
-          });
-          setData(data);
-          setLoading(false);
-        },
-        error => {
-          setError(error);
-          setLoading(false);
-        },
-      );
+            setData(data);
+            setLoading(false);
+          },
+          error => {
+            setError(error);
+            setLoading(false);
+          },
+        );
     }
     return () => unsubscribe();
   }, [query]);
@@ -73,9 +75,9 @@ function useFirestoreCollection(collection, pageSize, page) {
         },
       );
     } else {
-      setLoading(true);
       collection
         .limit(pageSize)
+        // .offset(page * pageSize)
         .get()
         .then(
           collectionSnapshot => {
