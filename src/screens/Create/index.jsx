@@ -66,12 +66,15 @@ const Create = ({navigation}) => {
         notificationAndroid('Post has been created');
         setContent('');
         setImages([]);
+        setIsLoading(false);
         navigation.navigate('home');
       });
   };
   return (
     <View style={styles.container}>
-      {isLoading ? <ActivityIndicator style={styles.loading} size="large" /> : null}
+      {isLoading ? (
+        <ActivityIndicator style={styles.loading} size="large" />
+      ) : null}
       <View style={styles.groupForm}>
         <View style={styles.groupInput}>
           <Text style={styles.inputLabel}>Content of your post</Text>
@@ -96,7 +99,7 @@ const Create = ({navigation}) => {
           {images.length !== 0
             ? images.map((img, index) => (
                 <Image
-                  key={img.path}
+                  key={index}
                   source={{
                     uri: img.path,
                   }}
