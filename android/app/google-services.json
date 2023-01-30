@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "136673728513-h146ttk9tte0taq41v7ecjucg6echf3o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.socialnetworkreactnative",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "136673728513-ov30r7mghmonu9kqqjpbhogptj9hd9kj.apps.googleusercontent.com",
           "client_type": 3
         }
